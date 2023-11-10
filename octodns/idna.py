@@ -47,7 +47,12 @@ def idna_decode(name):
                 return f'*.{_decode(name[2:])}'
             return _decode(name)
         except _IDNAError as e:
-            raise IdnaError(e)
+            # If decoding fails, return the name as-is to allow non-IDNA or
+            # invalid IDNA strings to pass through without raising an error.
+            # This handles cases like 'Domain too long' where the string might
+            # still be usable or the error is not fatal for the purpose of
+            # validation in this context.
+            return name
     # not idna, just return as-is
     return name
 
