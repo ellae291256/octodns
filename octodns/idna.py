@@ -34,7 +34,7 @@ def idna_encode(name):
                 return f'*.{name}'
             return _encode(name).decode('utf-8')
         except _IDNAError as e:
-            raise IdnaError(e)
+            raise ValidationError(e)
 
 
 def idna_decode(name):
@@ -47,7 +47,7 @@ def idna_decode(name):
                 return f'*.{_decode(name[2:])}'
             return _decode(name)
         except _IDNAError as e:
-            raise IdnaError(e)
+            raise ValidationError(e)
     # not idna, just return as-is
     return name
 

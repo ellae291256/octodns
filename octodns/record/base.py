@@ -68,6 +68,10 @@ class Record(EqualityTupleMixin):
             if context:
                 msg += f', {context}'
             raise Exception(msg)
+        try:
+            idna_decode(fqdn)
+        except IdnaError as e:
+            reasons.append(str(e))
         reasons.extend(_class.validate(name, fqdn, data))
         try:
             lenient |= data['octodns']['lenient']
