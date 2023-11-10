@@ -38,6 +38,12 @@ def idna_encode(name):
 
 
 def idna_decode(name):
+    # IDNA encoding has a maximum length limit (typically 253 bytes for the whole domain)
+    # We check the length to prevent the underlying library from raising an unhandled error
+    # for excessively long inputs.
+    if len(name) > 253:
+        raise IdnaError("Domain name is too long")
+    
     pieces = name.lower().split('.')
     if any(p.startswith('xn--') for p in pieces):
         try:
