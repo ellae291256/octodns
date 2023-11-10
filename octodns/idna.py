@@ -41,11 +41,12 @@ def idna_decode(name):
     pieces = name.lower().split('.')
     if any(p.startswith('xn--') for p in pieces):
         try:
-            # it's idna
-            if name.startswith('*'):
-                # idna.decode doesn't like the *
-                return f'*.{_decode(name[2:])}'
-            return _decode(name)
+            # it's idna, decode label by label so that overall length checks
+            # don't prevent decoding (e.g. for validation messages.) Labels
+            # that aren't idna, including *, are passed through as-is
+            return '.'.join(
+                _decode(p) if p.startswith('xn--') else p for p in pieces
+            )
         except _IDNAError as e:
             raise IdnaError(e)
     # not idna, just return as-is
