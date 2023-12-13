@@ -61,14 +61,14 @@ class Record(EqualityTupleMixin):
             msg = f'Invalid record {idna_decode(fqdn)}, missing type'
             if context:
                 msg += f', {context}'
-            raise Exception(msg)
+            raise ValidationError(msg)
         try:
             _class = cls._CLASSES[_type]
         except KeyError:
             msg = f'Unknown record type: "{_type}"'
             if context:
                 msg += f', {context}'
-            raise Exception(msg)
+            raise ValidationError(msg)
         reasons.extend(_class.validate(name, fqdn, data))
         try:
             lenient |= data['octodns']['lenient']

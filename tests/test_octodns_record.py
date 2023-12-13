@@ -556,19 +556,13 @@ class TestRecordValidation(TestCase):
         self.assertTrue(reason.startswith('invalid name "@", use "" instead'))
 
         # fqdn length, DNS defines max as 253
-        with self.assertRaises(ValidationError) as ctx:
+        with self.assertRaises(IdnaError) as ctx:
             # The . will put this over the edge
             name = 'x' * (253 - len(self.zone.name))
             Record.new(
                 self.zone, name, {'ttl': 300, 'type': 'A', 'value': '1.2.3.4'}
             )
-        reason = ctx.exception.reasons[0]
-        self.assertTrue(reason.startswith('invalid fqdn, "xxxx'))
-        self.assertTrue(
-            reason.endswith(
-                '.unit.tests." is too long at 254 chars, max is 253'
-            )
-        )
+        self.assertEqual('Domain too long', str(ctx.exception))
 
         # label length, DNS defines max as 63
         with self.assertRaises(ValidationError) as ctx:

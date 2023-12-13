@@ -30,8 +30,7 @@ def idna_encode(name):
         try:
             if name.startswith('*'):
                 # idna.encode doesn't like the *
-                name = _encode(name[2:]).decode('utf-8')
-                return f'*.{name}'
+                return f'*.{_encode(name[2:]).decode("utf-8")}'
             return _encode(name).decode('utf-8')
         except _IDNAError as e:
             raise IdnaError(e)
