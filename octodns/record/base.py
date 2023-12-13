@@ -90,8 +90,22 @@ class Record(EqualityTupleMixin):
             reasons.append('invalid name "@", use "" instead')
         n = len(fqdn)
         if n > 253:
+            from ..idna import IdnaError
+
+            try:
+                decoded_fqdn = idna_decode(fqdn)
+            except IdnaError:
+                # the full name can't be decoded as a whole, e.g. because it
+                # is too long, so decode it label by label for display
+                decoded_labels = []
+                for label in fqdn.split('.'):
+                    try:
+                        decoded_labels.append(idna_decode(label))
+                    except IdnaError:
+                        decoded_labels.append(label)
+                decoded_fqdn = '.'.join(decoded_labels)
             reasons.append(
-                f'invalid fqdn, "{idna_decode(fqdn)}" is too long at {n} '
+                f'invalid fqdn, "{decoded_fqdn}" is too long at {n} '
                 'chars, max is 253'
             )
         for label in name.split('.'):
